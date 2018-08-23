@@ -1,7 +1,6 @@
 # LeJIT
 > A JIT compiler for Rust
 
----
 
 ## This is very much a work in progress. Don't expect this to compile yet.
 
