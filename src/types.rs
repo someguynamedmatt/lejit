@@ -41,6 +41,7 @@ pub mod kind {
         }
     );
 }
+
 impl fmt::Debug for Ty {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         let kind = self.get_kind();
@@ -121,11 +122,13 @@ impl fmt::Debug for Ty {
         }
     }
 }
+
 impl fmt::Debug for Type {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         fmt::Debug::fmt(self.deref(), fmt)
     }
 }
+
 /// Type constants
 pub mod consts {
     use util::from_ptr;
@@ -163,6 +166,7 @@ pub mod consts {
         jit_type_sys_long_double -> get_sys_long_double
     )
 }
+
 /// A single field of a struct
 #[derive(PartialEq)]
 pub struct Field<'a> {
@@ -171,6 +175,7 @@ pub struct Field<'a> {
     _type: jit_type_t,
     marker: PhantomData<&'a ()>,
 }
+
 impl<'a> Field<'a> {
     #[inline]
     /// Get the field's name or none if it lacks one
@@ -185,6 +190,7 @@ impl<'a> Field<'a> {
             }
         }
     }
+
     #[inline(always)]
     /// Get the type of the field
     pub fn get_type(&self) -> &'a Ty {
@@ -192,6 +198,7 @@ impl<'a> Field<'a> {
             from_ptr(jit_type_get_field(self._type, self.index))
         }
     }
+
     #[inline(always)]
     /// Get the offset of the field
     pub fn get_offset(&self) -> usize {
@@ -200,6 +207,7 @@ impl<'a> Field<'a> {
         }
     }
 }
+
 /// Iterates through all the fields of a struct
 pub struct Fields<'a> {
     _type: jit_type_t,
@@ -207,6 +215,7 @@ pub struct Fields<'a> {
     length: c_uint,
     marker: PhantomData<&'a ()>,
 }
+
 impl<'a> Fields<'a> {
     #[inline(always)]
     fn new(ty:&'a Ty) -> Fields<'a> {
@@ -220,6 +229,7 @@ impl<'a> Fields<'a> {
         }
     }
 }
+
 impl<'a> Iterator for Fields<'a> {
     type Item = Field<'a>;
     fn next(&mut self) -> Option<Field<'a>> {
@@ -235,10 +245,12 @@ impl<'a> Iterator for Fields<'a> {
             None
         }
     }
+
     fn size_hint(&self) -> (usize, Option<usize>) {
         ((self.length - self.index) as usize, None)
     }
 }
+
 //deref owned type into type ref
 /// Iterator through all the arguments a function takes
 pub struct Params<'a> {
@@ -247,6 +259,7 @@ pub struct Params<'a> {
     length: c_uint,
     marker: PhantomData<&'a ()>
 }
+
 impl<'a> Params<'a> {
     fn new(ty:&'a Ty) -> Params<'a> {
         unsafe {
@@ -259,6 +272,7 @@ impl<'a> Params<'a> {
         }
     }
 }
+
 impl<'a> Iterator for Params<'a> {
     type Item = &'a Ty;
     fn next(&mut self) -> Option<&'a Ty> {
@@ -270,44 +284,52 @@ impl<'a> Iterator for Params<'a> {
             None
         }
     }
+
     #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
         ((self.length - self.index) as usize, None)
     }
 }
+
 /// An object that represents a native system type.
 /// This represents a basic system type, be it a primitive, a struct, a
 /// union, a pointer, or a function signature. The library uses this information
 /// to lay out values in memory.
 #[derive(Eq)]
 pub struct Ty(PhantomData<[()]>);
+
 impl<'a> From<&'a Ty> for jit_type_t {
     fn from(ty: &'a Ty) -> jit_type_t {
         unsafe { mem::transmute(ty) }
     }
 }
+
 impl<'a> From<&'a mut Ty> for jit_type_t {
     fn from(ty: &'a mut Ty) -> jit_type_t {
         unsafe { mem::transmute(ty) }
     }
 }
+
 impl<'a> From<jit_type_t> for &'a Ty {
     fn from(ty: jit_type_t) -> &'a Ty {
         unsafe { mem::transmute(ty) }
     }
 }
+
 impl PartialEq for Ty {
     fn eq(&self, other: &Ty) -> bool {
         unsafe {
             mem::transmute::<_, isize>(self) == mem::transmute(other)
         }
     }
+
     fn ne(&self, other: &Ty) -> bool {
         unsafe {
             mem::transmute::<_, isize>(self) != mem::transmute(other)
         }
     }
 }
+
 impl ToOwned for Ty {
     type Owned = Type;
     fn to_owned(&self) -> Type {
@@ -316,6 +338,7 @@ impl ToOwned for Ty {
         }
     }
 }
+
 impl Borrow<Ty> for Type {
     fn borrow(&self) -> &Ty {
         unsafe {
@@ -334,6 +357,7 @@ impl Borrow<Ty> for Type {
 pub struct Type {
     _type: jit_type_t,
 }
+
 native_ref!(Type, _type: jit_type_t);
 impl Clone for Type {
     #[inline]
@@ -344,6 +368,7 @@ impl Clone for Type {
         }
     }
 }
+
 #[unsafe_destructor]
 impl Drop for Type {
     #[inline(always)]
@@ -354,6 +379,7 @@ impl Drop for Type {
         }
     }
 }
+
 impl<'a> Deref for Type {
     type Target = Ty;
     fn deref(&self) -> &Ty {
@@ -362,6 +388,7 @@ impl<'a> Deref for Type {
         }
     }
 }
+
 impl<'a> DerefMut for Type {
     fn deref_mut(&mut self) -> &mut Ty {
         unsafe {
@@ -369,18 +396,23 @@ impl<'a> DerefMut for Type {
         }
     }
 }
+
 pub type CowType<'a> = Cow<'a, Ty>;
+
 pub type StaticType = &'static Ty;
+
 impl Into<CowType<'static>> for Type {
     fn into(self) -> CowType<'static> {
         Cow::Owned(self)
     }
 }
+
 impl<'a> Into<CowType<'a>> for &'a Ty {
     fn into(self) -> CowType<'a> {
         Cow::Borrowed(self)
     }
 }
+
 impl Type {
     /// Create a type descriptor for a function signature.
     pub fn new_signature(abi: Abi, return_type: &Ty, params: &mut [&Ty]) -> Type {
@@ -390,6 +422,7 @@ impl Type {
             from_ptr(signature)
         }
     }
+
     #[inline(always)]
     /// Create a type descriptor for a structure.
     pub fn new_struct(fields: &mut [&Ty]) -> Type {
@@ -398,6 +431,7 @@ impl Type {
             from_ptr(jit_type_create_struct(fields.as_mut_ptr(), fields.len() as c_uint, 1))
         }
     }
+
     #[inline(always)]
     /// Create a type descriptor for a union.
     pub fn new_union(fields: &mut [&Ty]) -> Type {
@@ -406,6 +440,7 @@ impl Type {
             from_ptr(jit_type_create_union(fields.as_mut_ptr(), fields.len() as c_uint, 1))
         }
     }
+
     #[inline(always)]
     /// Create a type descriptor for a pointer to another type.
     pub fn new_pointer(pointee: &Ty) -> Type {
@@ -415,6 +450,7 @@ impl Type {
         }
     }
 }
+
 impl Ty {
     #[inline(always)]
     /// Get the size of this type in bytes.
@@ -423,6 +459,7 @@ impl Ty {
             jit_type_get_size(self.into()) as usize
         }
     }
+
     #[inline(always)]
     /// Get the alignment of this type in bytes.
     pub fn get_alignment(&self) -> usize {
@@ -430,6 +467,7 @@ impl Ty {
             jit_type_get_alignment(self.into()) as usize
         }
     }
+
     #[inline]
     /// Get a value that indicates the kind of this type. This allows callers to
     /// quickly classify a type to determine how it should be handled further.
@@ -438,6 +476,7 @@ impl Ty {
             mem::transmute(jit_type_get_kind(self.into()))
         }
     }
+
     #[inline(always)]
     /// Get the type that is referred to by this pointer type.
     pub fn get_ref(&self) -> Option<&Ty> {
@@ -445,6 +484,7 @@ impl Ty {
             from_ptr_opt(jit_type_get_ref(self.into()))
         }
     }
+
     #[inline(always)]
     /// Get the type returned by this function type.
     pub fn get_return(&self) -> Option<&Ty> {
@@ -453,6 +493,7 @@ impl Ty {
             from_ptr_opt(jit_type_get_return(self.into()))
         }
     }
+
     /// Set the field or parameter names of this type.
     pub fn set_names(&mut self, names: &[&str]) {
         unsafe {
@@ -467,16 +508,19 @@ impl Ty {
             }
         }
     }
+
     #[inline(always)]
     /// Iterator over the type's fields
     pub fn fields(&self) -> Fields {
         Fields::new(self)
     }
+
     #[inline(always)]
     /// Iterator over the function signature's parameters
     pub fn params(&self) -> Params {
         Params::new(self)
     }
+
     #[inline]
     /// Find the field/parameter index for a particular name.
     pub fn get_field(&self, name:&str) -> Field {
@@ -489,6 +533,7 @@ impl Ty {
             }
         }
     }
+
     #[inline(always)]
     /// Check if this is a pointer
     pub fn is_primitive(&self) -> bool {
@@ -496,6 +541,7 @@ impl Ty {
             jit_type_is_primitive(self.into()) != 0
         }
     }
+
     #[inline(always)]
     /// Check if this is a struct
     pub fn is_struct(&self) -> bool {
@@ -503,6 +549,7 @@ impl Ty {
             jit_type_is_struct(self.into()) != 0
         }
     }
+
     #[inline(always)]
     /// Check if this is a union
     pub fn is_union(&self) -> bool {
@@ -510,6 +557,7 @@ impl Ty {
             jit_type_is_union(self.into()) != 0
         }
     }
+
     #[inline(always)]
     /// Check if this is a signature
     pub fn is_signature(&self) -> bool {
@@ -517,6 +565,7 @@ impl Ty {
             jit_type_is_signature(self.into()) != 0
         }
     }
+    
     #[inline(always)]
     /// Check if this is a pointer
     pub fn is_pointer(&self) -> bool {
@@ -524,6 +573,7 @@ impl Ty {
             jit_type_is_pointer(self.into()) != 0
         }
     }
+
     #[inline(always)]
     /// Check if this is tagged
     pub fn is_tagged(&self) -> bool {
@@ -532,6 +582,7 @@ impl Ty {
         }
     }
 }
+
 impl<'a> IntoIterator for &'a Ty {
     type IntoIter = Fields<'a>;
     type Item = Field<'a>;
@@ -545,12 +596,14 @@ pub struct TaggedType<T> where T:'static {
     _type: jit_type_t,
     _marker: PhantomData<T>
 }
+
 impl<'a, T> Into<jit_type_t> for &'a TaggedType<T> {
     /// Convert into a native pointer
     fn into(self) -> jit_type_t {
         self._type
     }
 }
+
 impl<T> From<jit_type_t> for TaggedType<T> {
     /// Convert from a native pointer
     fn from(ptr: jit_type_t) -> TaggedType<T> {
@@ -560,6 +613,7 @@ impl<T> From<jit_type_t> for TaggedType<T> {
         }
     }
 }
+
 impl<T> TaggedType<T> where T:'static {
     /// Create a new tagged type
     pub fn new(ty:&Ty, kind: kind::TypeKind, data: Box<T>) -> TaggedType<T> {
@@ -570,18 +624,21 @@ impl<T> TaggedType<T> where T:'static {
             from_ptr(ty)
         }
     }
+
     /// Get the data this is tagged to
     pub fn get_tagged_data(&self) -> Option<&T> {
         unsafe {
             mem::transmute(jit_type_get_tagged_data(self.into()))
         }
     }
+
     /// Get the type this is tagged to
     pub fn get_tagged_type(&self) -> &Ty {
         unsafe {
             from_ptr(jit_type_get_tagged_type(self.into()))
         }
     }
+
     /// Change the data this is tagged to
     pub fn set_tagged_data(&self, data: Box<T>) {
         unsafe {
@@ -591,6 +648,7 @@ impl<T> TaggedType<T> where T:'static {
         }
     }
 }
+
 #[unsafe_destructor]
 impl<T> Drop for TaggedType<T> {
     #[inline(always)]
@@ -603,6 +661,7 @@ impl<T> Drop for TaggedType<T> {
         }
     }
 }
+
 impl<T> Deref for TaggedType<T> {
     type Target = Ty;
     fn deref(&self) -> &Ty {
@@ -611,9 +670,9 @@ impl<T> Deref for TaggedType<T> {
         }
     }
 }
+
 #[inline(always)]
 /// Get the Rust type given as a type descriptor
 pub fn get<'a, T>() -> CowType<'a> where T:Compile<'a> {
     <T as Compile>::get_type()
 }
-
