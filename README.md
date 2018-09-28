@@ -3,6 +3,9 @@
 ___
 
 > A JIT compiler for Rust
+
+___
+
 [![Build Status](https://travis-ci.org/someguynamedmatt/lejit.svg?branch=master)](https://travis-ci.org/someguynamedmatt/lejit)
 
 
