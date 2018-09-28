@@ -1,4 +1,4 @@
-<div style="display:flex;flex-direction:column;align-items:center;"><img src="https://mttyng.nyc3.digitaloceanspaces.com/lejit.png" height="150" width="300" /></div>
+<p align="center"><img src="https://mttyng.nyc3.digitaloceanspaces.com/lejit.png" height="150" width="300" /></p>
 > A JIT compiler for Rust
 
 
