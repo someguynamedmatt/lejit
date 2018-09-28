@@ -1,4 +1,4 @@
-![Alt text](https://mttyng.nyc3.digitaloceanspaces.com/lejit.png "LeJIT")
+<img src="https://mttyng.nyc3.digitaloceanspaces.com/lejit.png" height="50" width="100" />
 > A JIT compiler for Rust
 
 
