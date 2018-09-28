@@ -3,6 +3,7 @@
 ___
 
 > A JIT compiler for Rust
+[![Build Status](https://travis-ci.org/someguynamedmatt/lejit.svg?branch=master)](https://travis-ci.org/someguynamedmatt/lejit)
 
 
 ## This is very much a work in progress. Don't expect this to compile yet.
