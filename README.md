@@ -2,7 +2,6 @@
 
 ___
 
-
 > A JIT compiler for Rust
 
 
