@@ -1,4 +1,4 @@
-# LeJIT
+![Alt text](https://mttyng.nyc3.digitaloceanspaces.com/lejit.png "LeJIT")
 > A JIT compiler for Rust
 
 
