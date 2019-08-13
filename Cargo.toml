@@ -7,4 +7,4 @@ authors = ["Matt <dev@mttyng.com>"]
 
 [dependencies]
 libc = "0.2"
-Boa = { path = "../boa" }
+Boa = "0.3"
