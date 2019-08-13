@@ -1,10 +1,6 @@
 <p align="center"><img src="https://mttyng.nyc3.digitaloceanspaces.com/red_lejit.png" height="150" width="300" /></p>
-
-___
-
 > A JIT compiler for Rust
 
-___
 
 [![Build Status](https://travis-ci.org/someguynamedmatt/lejit.svg?branch=master)](https://travis-ci.org/someguynamedmatt/lejit)
 
