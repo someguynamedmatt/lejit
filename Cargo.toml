@@ -6,3 +6,5 @@ version = "0.1.0"
 authors = ["Matt <dev@mttyng.com>"]
 
 [dependencies]
+libc = "0.2"
+Boa = { path = "../boa" }
